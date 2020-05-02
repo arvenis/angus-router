@@ -1,0 +1,7 @@
+config:
+    config_dir: from_file
+    wallet_dir: from_file
+    components_dir: from_file
+    connection_file: from_file/connection.yaml
+    openapi_file: from_file/openapi.yaml
+    inventory_file: from_file/chaincode.inventory.yaml

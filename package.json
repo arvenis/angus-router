@@ -1,0 +1,58 @@
+{
+  "name": "angus-router",
+  "version": "0.1.0",
+  "description": "Angus Router - Reference gateway for Angus framework",
+  "main": "server.js",
+  "types": "./types/index.d.ts",
+  "author": "Istvan Banfi",
+  "license": "Apache-2.0",
+  "engineStrict": true,
+  "engines": {
+    "node": ">=8",
+    "npm": ">=5"
+  },
+  "scripts": {
+    "start": "node dist/server.js",
+    "coverage": "node_modules/.bin/nyc mocha",
+    "build": "node_modules/.bin/tsc && cp package.json dist/ && cp -r src/types dist/ && cp -r src/config dist/",
+    "test": "node_modules/.bin/mocha"
+
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "chalk": "^2.4.2",
+    "express": "^4.16.4",
+    "express-gateway": "^1.16.3",
+    "express-openapi": "^4.6.4",
+    "express-winston": "^3.1.0",
+    "fabric-client": "^1.4.3",
+    "fabric-network": "^1.4.1",
+    "js-yaml": "^3.13.1",
+    "lodash": "^4.17.15",
+    "openapi-request-validator": "^3.8.3",
+    "openapi-response-validator": "^3.8.2",
+    "swagger-parser": "^8.0.0",
+    "swagger-ui-express": "^4.0.7",
+    "uuid": "^3.3.2",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.16.1",
+    "@types/express-winston": "^3.0.1",
+    "@types/js-yaml": "^3.12.1",
+    "@types/lodash": "^4.14.123",
+    "@types/swagger-jsdoc": "0.0.2",
+    "@types/swagger-ui-express": "^3.0.1",
+    "@types/uuid": "^3.4.4",
+    "@types/validator": "^10.11.1",
+    "@types/chai": "^4.2.7",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.12.14",
+    "chai": "^4.2.0",
+    "mocha": "^6.2.2",
+    "nyc": "^15.0.0",
+    "ts-node": "^8.5.4",
+    "tslint": "^5.20.1",
+    "typescript": "^3.4.5"
+  }
+}

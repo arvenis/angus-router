@@ -1,0 +1,27 @@
+openapi: 3.0.0
+info:
+  title: Angus Router default REST API definition
+  version: '0.1'
+
+paths:
+  #############
+  # Maintenance
+  #############
+  /maintenance/healthcheck:
+    x-angus-config:
+      - getVersion
+    x-angus-custom-handler: customHandler
+    get:
+      tags:
+        - Maintenance
+      responses:
+        '200':
+          description: Status of the fabric system
+          content:
+            application/json:
+              schema:
+                $ref: 'angus-components.yaml#/components/schemas/mResHealthcheck'
+        '400':
+          $ref: 'angus-components.yaml#/components/responses/BadRequest'
+        '500':
+          $ref: 'angus-components.yaml#/components/responses/InternalError'

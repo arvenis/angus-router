@@ -1,0 +1,13 @@
+# Defines the avaliable channel for this gateway
+channels:
+  transaction: &transaction
+    name: general
+    
+#Defines the avalilable methods for this gateway based on the channels above
+ccMethods:
+  - name: getVersion
+    channelName: *transaction
+    chaincodeName: default
+    smartContractName: DefaultContract
+    serviceName: getVersion
+    processType: evaluate

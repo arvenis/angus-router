@@ -1,0 +1,134 @@
+openapi: 3.0.0
+info:
+  title: Angus components definiton
+  version: '0.1'
+paths:
+  /dummy:
+    get:
+      description: Dummy
+      responses:
+        200:
+          description: Dummy
+components:
+  parameters:
+    HeaderCustomerId:
+      name: X-Angus-Id
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    ValidationErrorItem:
+      type: object
+      required:
+        - path
+        - errorCode
+        - message
+        - location
+      properties:
+        path:
+          type: string
+        errorCode:
+          type: string
+        message:
+          type: string
+        location:
+          type: string
+        level:
+          type: string
+        timestamp:
+          type: string
+        label:
+          type: string
+    ValidationError:
+      type: object
+      required:
+        - status
+        - errors
+      properties:
+        status:
+          type: integer
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationErrorItem'
+    FabricError:
+      type: object
+      properties:
+        status:
+          type: integer
+        name:
+          type: string
+        message:
+          type: string
+        label:
+          type: string
+        code:
+          type: string
+        stack:
+          type: string
+        timestamp:
+          type: number
+
+# Technical components
+    tRequestHeader:
+      required:
+        - timestamp
+      properties:
+        timestamp:
+          type: number
+    tResponseHeader:
+      required:
+        - trId
+      properties:
+        trId:
+          type: string
+# Entities
+    eFabricStatus:
+      type: object
+      description: Represents the status of the network components
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+        version:
+          type: string
+        channel:
+          type: string
+# Messages
+    mResHealthcheck:
+      type: object
+      required:
+        - gateway
+        - chaincode
+      properties:
+        header:
+          $ref: '#/components/schemas/tResponseHeader'
+        gateway:
+          type: object
+          properties:
+            status:
+              type: string
+            version:
+              type: string
+        chaincode:
+          type: array
+          items:
+            $ref: '#/components/schemas/eFabricStatus'
+
+  responses:
+    BadRequest:
+      description: Parameters are missing or in bad format
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationError'
+    InternalError:
+      description: Error in Fabric
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FabricError'
+          

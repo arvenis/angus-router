@@ -1,0 +1,55 @@
+http:
+  host: '*'
+  port: 8888
+admin:
+  host: localhost
+  port: 9876
+apiEndpoints:
+  fabric:
+    host: '*'
+    paths:
+      - /maintenance/*
+  admin:
+    host: '*'
+    paths:
+      - /admin/*
+      - /api-docs*
+serviceEndpoints:
+  fabric:
+    url: 'http://localhost:3888'
+  admin:
+    url: 'http://localhost:3888'
+policies:
+  - basic-auth
+  - cors
+  - expression
+  - key-auth
+  - log
+  - oauth2
+  - proxy
+  - rate-limit
+pipelines:
+  default:
+    apiEndpoints:
+      - fabric
+    policies:
+      - log:
+        - action:
+            message: "angus call: ${req.originalUrl}"
+      - proxy:
+        - action:
+            serviceEndpoint: fabric 
+            changeOrigin: true
+  admin:
+    apiEndpoints:
+      - admin
+    policies:
+      - log:
+        - action:
+            message: "angus admin call: ${req.originalUrl}"
+      - proxy:
+        - action:
+            serviceEndpoint: admin 
+            changeOrigin: true
+
+
