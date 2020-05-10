@@ -10,7 +10,7 @@ const logger = getLogger(__filename);
 
 const DEFAULT_CONFIG = {
     "config_dir": path.join(path.dirname(__dirname), "config"),
-    "wallet_dir": path.join(path.dirname(__dirname), "wallet"),
+    "wallet_dir": path.join(os.homedir(), '.angus', 'wallet'),
     "components_dir": path.join(path.dirname(__dirname), "config"),
     "module_dir": path.join(path.dirname(__dirname), "module"),
     "connection_file": path.join(os.homedir(), '.angus', 'profiles','default.yaml'),

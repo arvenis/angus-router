@@ -11,3 +11,4 @@ ccMethods:
     smartContractName: DefaultContract
     serviceName: getVersion
     processType: evaluate
+    defaultUser: system

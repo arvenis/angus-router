@@ -21,6 +21,7 @@ export class FabricConfig {
   public smartContractName: string;
   public serviceName: string;
   public processType: ServiceType;
+  public defaultUser: string;
 }
 
 export class FabricService {
@@ -29,7 +30,7 @@ export class FabricService {
   public fabricServices: FabricConfig[];
 }
 
-export type FCustomHandler = (params: FabricService, request: Request, response: Response, nex: NextFunction) => any;
+export type FCustomHandler = (params: FabricService, request: Request, response: Response, next: NextFunction) => any;
 
 export class GenericError extends Error {
   public status: number;

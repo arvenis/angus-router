@@ -5,7 +5,7 @@ import _ from 'lodash';
 import * as path from 'path';
 import * as uuid from 'uuid';
 
-import { FabricConfig, FabricService, ServiceType, FabricError } from './common';
+import { FabricConfig, FabricService, ServiceType, FabricError, AngusError, CONST } from './common';
 
 import { Gateway, Transaction } from 'fabric-network';
 
@@ -120,9 +120,17 @@ export async function processTransaction(params: FabricService, config?: FabricC
 
     // Create a new gateway for connecting to our peer node.
     const gateway = new Gateway();
-    logger.debug(`Connecting to the gateway as ${params.customerId}...`);
-    await gateway.connect(ccp, { wallet, identity: params.customerId, discovery: { enabled: false } });
-    logger.debug(`Connected to the gateway as ${params.customerId}.`);
+    let _customerId=params.customerId;
+    // Set default user if it exists
+    if (_.isUndefined(_customerId)) 
+      _customerId = _fabricConfig.defaultUser;
+
+    if (_.isUndefined(_customerId)) 
+      throw new AngusError(`${CONST.HEADER_USERID} is not defined in HTTP header. `);
+
+    logger.debug(`Connecting to the gateway as ${_customerId}...`);
+    await gateway.connect(ccp, { wallet, identity: _customerId, discovery: { enabled: false } });
+    logger.debug(`Connected to the gateway as ${_customerId}.`);
 
     // Get the network (channel) our contract is deployed to.
     logger.debug(`Loading network channel ${_fabricConfig.channelName}...`);
