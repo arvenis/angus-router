@@ -16,7 +16,6 @@
     "coverage": "node_modules/.bin/nyc mocha",
     "build": "node_modules/.bin/tsc && cp package.json dist/ && cp -r src/types dist/ && cp -r src/config dist/",
     "test": "node_modules/.bin/mocha"
-
   },
   "dependencies": {
     "body-parser": "^1.19.0",
