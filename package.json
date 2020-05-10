@@ -2,8 +2,8 @@
   "name": "angus-router",
   "version": "0.1.0",
   "description": "Angus Router - Reference gateway for Angus framework",
-  "main": "server.js",
-  "types": "./types/index.d.ts",
+  "main": "dist/server.js",
+  "types": "dist/types/index.d.ts",
   "author": "Istvan Banfi",
   "license": "Apache-2.0",
   "engineStrict": true,
@@ -16,6 +16,7 @@
     "coverage": "node_modules/.bin/nyc mocha",
     "build": "node_modules/.bin/tsc && cp package.json dist/ && cp -r src/types dist/ && cp -r src/config dist/",
     "test": "node_modules/.bin/mocha"
+
   },
   "dependencies": {
     "body-parser": "^1.19.0",
