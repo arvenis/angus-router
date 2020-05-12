@@ -18,7 +18,7 @@ import { Config } from './config';
 import { getLogger } from './logger';
 const logger = getLogger(__filename);
 
-const configDir:string = process.env.FABRIC_GW_CGG_PATH    || path.join(path.dirname(__dirname), "config");
+const configDir:string = process.env.FABRIC_GW_CFG_PATH    || path.join(path.dirname(__dirname), "config");
 const walletDir:string = process.env.FABRIC_GW_WALLET      || path.join(path.dirname(path.dirname(path.dirname(__dirname))), "wallet");
 const connConfig:string = process.env.FABRIC_GW_CONNECTION || path.join(path.dirname(__dirname), "config", "connection.yaml");
 
