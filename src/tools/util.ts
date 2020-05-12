@@ -18,32 +18,13 @@ import { Config } from './config';
 import { getLogger } from './logger';
 const logger = getLogger(__filename);
 
-const configDir:string = process.env.FABRIC_GW_CFG_PATH    || path.join(path.dirname(__dirname), "config");
-const walletDir:string = process.env.FABRIC_GW_WALLET      || path.join(path.dirname(path.dirname(path.dirname(__dirname))), "wallet");
-const connConfig:string = process.env.FABRIC_GW_CONNECTION || path.join(path.dirname(__dirname), "config", "connection.yaml");
-
-export function getConfigDir() {
-  return configDir;
-}
-export function getWalletDir() {
-  return walletDir;
-}
-
-export function getConnectionFile(): string {
-  return connConfig;
-}
-
 export function getConfiguration(): any {
   // TODO: Error handling
-  return yaml.safeLoad(fs.readFileSync(connConfig, 'utf8'));
-}
-
-export function getOpenApiFile(): string {
-  return path.join(getConfigDir(), 'openapi.yaml');
+  return yaml.safeLoad(fs.readFileSync(Config.getConfigItem('connection_file'), 'utf8'));
 }
 
 export function getOpenApiAsJson(): any {
-  return yaml.safeLoad(fs.readFileSync(getOpenApiFile(), 'utf8'));
+  return yaml.safeLoad(fs.readFileSync( Config.getConfigItem('openapi_file'), 'utf8'));
 }
 
 export function getWallet(): FileSystemWallet {
