@@ -1,0 +1,49 @@
+name: Build Angus router
+on: 
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup node v12
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+          registry-url: https://registry.npmjs.org
+
+      - name: Install Angus router
+        run: npm install
+
+      - name: Run linter
+        run: echo Run linter here...
+
+      - name: Run unit tests
+        run: echo Run unit tests here...
+        
+      - name: Build package
+        run: npm run build
+
+      - name: Package application
+        run: yarn pack
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: angus-router
+          path: angus-router*.tgz
+
+      - name: Login to npmjs
+        run: echo //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} > .npmrc 
+
+      - name: Push artifact
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
