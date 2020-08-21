@@ -5,4 +5,3 @@ dist
 .tscache
 *.tgz
 yarn-error.log
-package-lock.json
