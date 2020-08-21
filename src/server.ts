@@ -40,7 +40,7 @@ function startGatewayBackend() {
 export class AngusRouter {
   constructor(configFile?: string) {
     // Create configuration settings
-    Config.createInstance(configFile || process.env.CONFIG_FILE);
+    Config.createInstance( process.env.CONFIG_FILE || configFile );
   }
 
   start() {
