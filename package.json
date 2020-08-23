@@ -1,6 +1,6 @@
 {
   "name": "angus-router",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Angus Router - Reference gateway for Angus framework",
   "main": "dist/server.js",
   "types": "dist/types/index.d.ts",

@@ -1,13 +1,14 @@
 import * as Express from 'express';
 import _ from 'lodash';
 import * as path from 'path';
+import * as fs from 'fs';
 
 import OpenAPIRequestValidator from 'openapi-request-validator';
 import OpenAPIResponseValidator from 'openapi-response-validator';
 import { OpenAPI, OpenAPIV3 } from 'openapi-types';
 import * as util from './tools/util';
 
-import { CONST, FabricConfig, FabricService, FCustomHandler } from './tools/common';
+import { CONST, FabricConfig, FabricService, FCustomHandler, AngusError } from './tools/common';
 import { APIDefinition } from './tools/apidefinition';
 import { ChaincodeInventory } from './tools/chaincodeinventory';
 
@@ -70,7 +71,6 @@ export async function handleRequest(req: Express.Request, res: Express.Response,
       throw new Error(`No config found for ${req.path}`);
     }
 
-    // _serviceParams=[JSON.stringify(_serviceParams2)];
     // Fill Fabric service object
     const _fabricService: FabricService = {
       customerId: req.get(CONST.HEADER_USERID),
@@ -83,9 +83,22 @@ export async function handleRequest(req: Express.Request, res: Express.Response,
     let retval: any = {};
 
     if (!_.isNil(_customHandler)) {
+      let _mPath: string;
       // Custom handler has been defined
-      let _mPath = path.join(Config.getConfigItem("module_dir"), req.path);
-      logger.debug(`Start customHandler in ${_mPath}:${_customHandler}`);
+      if (fs.existsSync(path.join(__dirname, "module", req.path) + '.js') ) {
+        // Check built-in custom handler (module folder)
+        _mPath=path.join(__dirname, "module", req.path);
+        logger.debug(`Start built-in customHandler: ${_mPath}:${_customHandler}`);
+
+      } else if (fs.existsSync(path.join(Config.getConfigItem("module_dir"), req.path)+ '.js')) {
+        // Check external custom handler
+        _mPath = path.join(Config.getConfigItem("module_dir"), req.path);
+        logger.debug(`Start external customHandler in ${_mPath}:${_customHandler}`);
+
+      } else {
+        throw new AngusError(`Specified customHandler ${_customHandler} not found in module path`);
+      }
+
       const fn_customHandler: FCustomHandler = require(_mPath)[_customHandler];
 
       retval = await fn_customHandler(_fabricService, req, res, next);
