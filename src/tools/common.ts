@@ -47,7 +47,7 @@ export class GenericError extends Error {
 export class AngusError extends GenericError {
   constructor(error:any) {
     super(error);
-    const logger = getLogger("AngusError").error(error);
+    //const logger = getLogger("AngusError").error(error);
 
   }  
 }
