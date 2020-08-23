@@ -11,13 +11,19 @@ paths:
           description: Dummy
 components:
   parameters:
-    HeaderCustomerId:
-      name: X-Angus-Id
+    HeaderUserId:
+      name: X-angus-Userid
       in: header
       required: true
       schema:
+        type: string      
+    CommonUUID:
+      name: id
+      in: query
+      required: true
+      schema:
         type: string
-        format: uuid
+        format: uuid        
   schemas:
     ValidationErrorItem:
       type: object
@@ -98,6 +104,31 @@ components:
         channel:
           type: string
 # Messages
+    mReqEnrollUser:
+      type: object
+      required:
+        - username
+        - registrar
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        registrar:
+          type: string
+    mResEnrollUser:
+      type: object
+      required:
+        - username
+        - type
+        - mspId
+      properties:
+        username:
+          type: string
+        type:
+          type: string
+        mspId:
+          type: string
     mResHealthcheck:
       type: object
       required:

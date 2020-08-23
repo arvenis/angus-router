@@ -97,6 +97,7 @@ export async function handleRequest(req: Express.Request, res: Express.Response,
     req.res = retval;
     next();
   } catch (error) {
+    logger.error(error);
     next(error);
   }
 }
