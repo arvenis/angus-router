@@ -12,6 +12,7 @@ const gateway = require('express-gateway');
 import { getLogger } from './tools/logger';
 import * as util from './tools/util';
 import {Config} from './tools/config';
+import { FabricService, FabricConfig } from './tools/common'
 
 const logger = getLogger(__filename);
 
@@ -49,4 +50,8 @@ export class AngusRouter {
     // Start Angus Router
     setImmediate(() => startGatewayBackend());
   }
+}
+
+export async function processTransaction(params: FabricService, config?: FabricConfig): Promise<any> {
+  return await util.processTransaction(params, config);
 }
