@@ -31,8 +31,8 @@ function startGateway() {
  *
  */
 function startGatewayBackend() {
-  const gw_config = yaml.safeLoad(fs.readFileSync(path.join(Config.getConfigItem("config_dir"), 'gateway.config.yml'), 'utf8'));
-  const _url = new url.URL(gw_config.serviceEndpoints.fabric.url);
+  const gw_config = yaml.load(fs.readFileSync(path.join(Config.getConfigItem("config_dir"), 'gateway.config.yml'), 'utf8'));
+  const _url = new url.URL(gw_config["serviceEndpoints"]["fabric"]["url"]);
   const be = express();
   routes(be);
   be.listen(_url.port, () => logger.info(`Angus router listening on port ${_url.port}`));

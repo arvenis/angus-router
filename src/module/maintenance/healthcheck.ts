@@ -19,7 +19,7 @@ export async function customHandler(
   next: Express.NextFunction
 // ):Promise<MResHealthcheck> {
   ):Promise<any> {  
-  const pjson = yaml.safeLoad(
+  const pjson = yaml.load(
     fs.readFileSync(path.join(path.dirname(path.dirname(__dirname)), 'package.json'), 'utf8')
   );
 
@@ -37,7 +37,7 @@ export async function customHandler(
   return {
     gateway: {
       status: 'OK',
-      version: pjson.version,  
+      version: pjson["version"],  
     },
     chaincode: result
   };

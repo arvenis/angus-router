@@ -7,10 +7,9 @@ import * as uuid from 'uuid';
 
 import { FabricConfig, FabricService, ServiceType, FabricError, AngusError, CONST } from './common';
 
-import { Gateway, Transaction } from 'fabric-network';
+import { Gateway, Transaction, Wallet, Wallets } from 'fabric-network';
 
-import { TransactionId } from 'fabric-client';
-import { FileSystemWallet } from 'fabric-network';
+// import { FileSystemWallet } from 'fabric-network';
 import { Config } from './config';
 
 
@@ -20,16 +19,16 @@ const logger = getLogger(__filename);
 
 export function getConfiguration(): any {
   // TODO: Error handling
-  return yaml.safeLoad(fs.readFileSync(Config.getConfigItem('connection_file'), 'utf8'));
+  return yaml.load(fs.readFileSync(Config.getConfigItem('connection_file'), 'utf8'));
 }
 
 export function getOpenApiAsJson(): any {
-  return yaml.safeLoad(fs.readFileSync( Config.getConfigItem('openapi_file'), 'utf8'));
+  return yaml.load(fs.readFileSync( Config.getConfigItem('openapi_file'), 'utf8'));
 }
 
-export function getWallet(): FileSystemWallet {
+export async function getWallet(): Promise<Wallet> {
   // TODO: Error handling
-  return new FileSystemWallet(Config.getConfigItem('wallet_dir'));
+  return await Wallets.newFileSystemWallet(Config.getConfigItem('wallet_dir'));
 }
 
 export function getAccountId(): string {
@@ -38,10 +37,10 @@ export function getAccountId(): string {
 
 export async function isWalletExists(customerId: string): Promise<boolean> {
   try {
-    const wallet = getWallet();
+    const wallet: Wallet = await getWallet();
     let userExists = false;
 
-    userExists = await wallet.exists(customerId);
+    userExists = true; // await wallet.exists(customerId);
 
     if (userExists) {
       logger.debug(`Wallet ${customerId} already exists.`);
@@ -63,7 +62,7 @@ export async function getConnectedGateway(customerId: string): Promise<Gateway> 
 
     // Create a new file system based wallet for managing identities.
     logger.debug('Loading wallet...');
-    const wallet = getWallet();
+    const wallet = await getWallet();
     logger.debug('Wallet loaded.');
 
     // Create a new gateway for connecting to our peer node.
@@ -96,7 +95,7 @@ export async function processTransaction(params: FabricService, config?: FabricC
 
     // Create a new file system based wallet for managing identities.
     logger.debug('Loading wallet...');
-    const wallet = getWallet();
+    const wallet = await getWallet();
     logger.debug('Wallet loaded.');
 
     // Create a new gateway for connecting to our peer node.
@@ -134,10 +133,10 @@ export async function processTransaction(params: FabricService, config?: FabricC
       // Submit the specified transaction.
       logger.debug(`Creating transaction ${_fabricConfig.serviceName}...`);
       const _transaction: Transaction = contract.createTransaction(_fabricConfig.serviceName);
-      const _trId: TransactionId = _transaction.getTransactionID();
+      const _trId = _transaction.getTransactionId();
 
       logger.debug(
-        `Transaction ${_fabricConfig.serviceName} has been submitted. trID: ${JSON.stringify(_trId.getTransactionID())}`
+        `Transaction ${_fabricConfig.serviceName} has been submitted. trID: ${JSON.stringify(_trId)}`
       );
       await _transaction.submit(...[params.serviceParams]).then(data => {
         logger.debug(`Result: ${JSON.parse(data.toString())}`);

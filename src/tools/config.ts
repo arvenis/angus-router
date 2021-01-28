@@ -31,8 +31,8 @@ export namespace Config {
         if (!_.isUndefined(configFile)) {
 
             try {
-                let _config = yaml.safeLoad(fs.readFileSync(configFile, 'utf8'));
-                _.assign (config, _config.config);
+                let _config = yaml.load(fs.readFileSync(configFile, 'utf8'));
+                _.assign (config, _config["config"]);
                 
             } catch (exception) {
                 logger.debug(exception);
@@ -53,6 +53,6 @@ export namespace Config {
                 config[key] = _s;
             }          
         });
-        logger.info(`Used configuration: \n${yaml.safeDump(config)}`);
+        logger.info(`Used configuration: \n${yaml.dump(config)}`);
     }
 }
