@@ -6,6 +6,7 @@ import * as swaggerUI from 'swagger-ui-express';
 import { errorHandler, handleRequest, validateInputParameters, validateResponse } from './handler';
 import { APIDefinition } from './tools/apidefinition';
 import { ChaincodeInventory } from './tools/chaincodeinventory';
+import { initialize } from './init'
 
 /**
  * Express API entry point
@@ -19,6 +20,7 @@ export default async function(gatewayExpressApp: Express.Application) {
   gatewayExpressApp.use(bodyParser.urlencoded({ extended: true }));
   await APIDefinition.createInstance();
   ChaincodeInventory.createInstance();
+  initialize()
 
   // OpenAPI documentaion
   gatewayExpressApp.use('/api-docs', swaggerUI.serve);

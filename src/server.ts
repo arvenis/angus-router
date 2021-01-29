@@ -46,7 +46,8 @@ export class AngusRouter {
 
   start() {
     // Start express gateway
-    setImmediate(() => startGateway());
+    // setImmediate(() => startGateway());
+    
     // Start Angus Router
     setImmediate(() => startGatewayBackend());
   }

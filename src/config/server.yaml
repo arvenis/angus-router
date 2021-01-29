@@ -1,0 +1,14 @@
+# Custom configuration for router
+config:
+  components_dir: ./
+# Configuration directory for express gateway. It MUST contain all the config files for express gateway
+# Leave it if you don't really need
+  config_dir: "./api-gateway"
+# The storage of the wallets
+  wallet_dir: "../wallet"
+# components_dir: ""
+  module_dir: "../module"
+  connection_file: dist/config/connection.yaml
+  openapi_file: dist/config/openapi/openapi.yaml
+  inventory_file: dist/config/chaincode.inventory.yaml
+# components_file: ""

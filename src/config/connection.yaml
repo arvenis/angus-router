@@ -1,0 +1,66 @@
+version: "1.0"
+name: nts-network
+
+client:
+  organization: Nts
+  credentialStore:
+    path: "/home/vagrant/.angus/store"
+    cryptoStore:
+      path: "/home/vagrant/.angus/store"
+
+  connection:
+    timeout:
+      peer:
+        endorser: 120
+        eventHub: 60
+        eventReg: 3
+      orderer: 30
+
+channels:
+  general:
+    orderers:
+      - orderer
+    #  - orderer-2
+    #  - orderer-3
+    peers:
+      peer0:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+        discover: true
+
+organizations:
+  Nts:
+    mspid: Peer0MSP
+    peers:
+      - peer0
+    certificateAuthorities:
+      - angusCa
+orderers:
+  orderer:
+    url: grpcs://orderer:7050
+    tlsCACerts:
+      path: /etc/hyperledger/fabric/crypto/orderer/tls-msp/signcerts/OrdererMSP-cert-tls.pem
+  # orderer-2:
+  #   url: grpcs://orderer-2:7050
+  #   tlsCACerts:
+  #     path: /etc/hyperledger/fabric/crypto/orderer-2/tls-msp/signcerts/OrdererMSP-cert-tls.pem
+  # orderer-3:
+  #   url: grpcs://orderer-3:7050
+  #   tlsCACerts:
+  #     path: /etc/hyperledger/fabric/crypto/orderer-3/tls-msp/signcerts/OrdererMSP-cert-tls.pem
+
+peers:
+  peer0:
+    url: grpcs://peer0:7051
+    tlsCACerts:
+      path: /etc/hyperledger/fabric/crypto/peer0/tls-msp/signcerts/Peer0MSP-cert-tls.pem
+
+certificateAuthorities:
+  angusCa:
+    url: http://ca-fabric-ca:7054
+    registrar:
+      - enrollId: admin
+        enrollSecret: adminpw
+    caName: ca
