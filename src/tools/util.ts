@@ -38,9 +38,9 @@ export function getAccountId(): string {
 export async function isWalletExists(customerId: string): Promise<boolean> {
   try {
     const wallet: Wallet = await getWallet();
-    let userExists = false;
+    // let userExists = false;
 
-    userExists = true; // await wallet.exists(customerId);
+    let userExists = !_.isUndefined(await wallet.get(customerId));
 
     if (userExists) {
       logger.debug(`Wallet ${customerId} already exists.`);

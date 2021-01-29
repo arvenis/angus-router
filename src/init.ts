@@ -16,7 +16,18 @@ import { getLogger } from './tools/logger';
 import { Config } from './tools/config';
 const logger = getLogger(__filename);
 
-export function initialize() {
-    logger.debug("Initialize gateway....")
+export async function initialize() {
+    logger.info("Initialize gateway....")
+    logger.debug("Checking admin enrollment..")
+    let _registrarId = "admin"
+    try {
+        if (!(await util.isWalletExists(_registrarId))) {
+            logger.info(`Admin wallet for registrar ${_registrarId} doesn't exist, yo have to enroll it.`);
+          }
+    } catch (error) {
+        logger.error(error);
+        return error;
+    }
+
     logger.debug("Initialization finished.")
 }
