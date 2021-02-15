@@ -1,8 +1,8 @@
 version: "1.0"
-name: nts-network
+name: Network
 
 client:
-  organization: Nts
+  organization: c01
   credentialStore:
     path: "/home/vagrant/.angus/store"
     cryptoStore:
@@ -31,7 +31,7 @@ channels:
         discover: true
 
 organizations:
-  Nts:
+  c01:
     mspid: Peer0MSP
     peers:
       - peer0
@@ -59,7 +59,7 @@ peers:
 
 certificateAuthorities:
   angusCa:
-    url: http://ca-fabric-ca:7054
+    url: http://localhost:7054
     registrar:
       - enrollId: admin
         enrollSecret: adminpw

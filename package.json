@@ -25,6 +25,7 @@
     "express-openapi": "^7.3.0",
     "express-winston": "^4.0.5",
     "fabric-network": "^2.2.5",
+    "fabric-ca-client": "2.2.5",
     "js-yaml": "^4.0.0",
     "lodash": "^4.17.20",
     "openapi-request-validator": "^7.3.0",
