@@ -2,11 +2,11 @@
 import _ from 'lodash';
 import { OpenAPI, OpenAPIV3 } from 'openapi-types';
 import SwaggerParser from 'swagger-parser';
-import {Config} from './config';
-import { CONST, AngusError } from './common';
-
-
+import { AngusError, CONST } from './common';
+import { Config } from './config';
 import { getLogger } from './logger';
+
+
 
 const logger = getLogger(__filename);
 

@@ -2,9 +2,9 @@ import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import _ from 'lodash';
 import { FabricConfig } from './common';
-import {Config} from './config';
-
+import { Config } from './config';
 import { getLogger } from './logger';
+
 const logger = getLogger(__filename);
 
 // tslint:disable-next-line no-namespace

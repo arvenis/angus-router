@@ -1,18 +1,18 @@
+import express from 'express';
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import * as path from 'path';
 import * as url from 'url';
-
-import express from 'express';
 import routes from './routes';
+import { FabricConfig, FabricService } from './tools/common';
+import { Config } from './tools/config';
+import { getLogger } from './tools/logger';
+import * as util from './tools/util';
+
 
 // tslint:disable-next-line: no-var-requires
 const gateway = require('express-gateway');
 
-import { getLogger } from './tools/logger';
-import * as util from './tools/util';
-import {Config} from './tools/config';
-import { FabricService, FabricConfig } from './tools/common'
 
 const logger = getLogger(__filename);
 

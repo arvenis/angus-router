@@ -14,7 +14,7 @@
   "scripts": {
     "start": "node dist/server.js",
     "coverage": "node_modules/.bin/nyc mocha",
-    "build": "node_modules/.bin/tsc && cp package.json dist/ && cp -r src/types dist/ && cp -r src/config dist/",
+    "build": "tsc && cp package.json dist/ && cp -r src/config dist/",
     "test": "jest"
   },
   "dependencies": {
@@ -26,6 +26,7 @@
     "express-winston": "^3.1.0",
     "fabric-client": "^1.4.3",
     "fabric-network": "^1.4.1",
+    "fabric-ca-client": "^1.4.3",
     "js-yaml": "^3.13.1",
     "lodash": "^4.17.15",
     "openapi-request-validator": "^3.8.3",
