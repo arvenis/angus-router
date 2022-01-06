@@ -2,11 +2,12 @@
   "name": "angus-router",
   "version": "0.1.4",
   "description": "Angus Router - Reference gateway for Angus framework",
-  "main": "dist/server.js",
+  "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "author": "Istvan Banfi",
   "license": "Apache-2.0",
   "engineStrict": true,
+  "type": "commonjs",
   "engines": {
     "node": ">=10",
     "npm": ">=6"
