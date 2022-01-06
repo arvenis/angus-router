@@ -92,7 +92,6 @@ export async function handleRequest(req: Express.Request, res: Express.Response,
 
       } else if (
         fs.existsSync(path.join(Config.getConfigItem("module_dir"), req.path)+ '.js') // .JS file
-        || fs.existsSync(path.join(Config.getConfigItem("module_dir"), req.path)+ '.ts') // .TS file
       ) {
         // Check external custom handler
         _mPath = path.join(Config.getConfigItem("module_dir"), req.path);

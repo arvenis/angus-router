@@ -3,5 +3,5 @@
 export * from './server';
 export * from './tools/common';
 export * from './tools/logger';
-export { getAccountId, getConfiguration, getWallet, isWalletExists } from './tools/util';
+export { enrollUser, getAccountId, getConfiguration, getWallet, isWalletExists } from './tools/util';
 
