@@ -1,7 +1,7 @@
 // tslint:disable no-identical-functions
+import SwaggerParser from '@apidevtools/swagger-parser';
 import _ from 'lodash';
 import { OpenAPI, OpenAPIV3 } from 'openapi-types';
-import SwaggerParser from 'swagger-parser';
 import { AngusError, CONST } from './common';
 import { Config } from './config';
 import { getLogger } from './logger';

@@ -71,7 +71,7 @@ export class FabricError extends GenericError {
     this.label=error.label;
     this.level=error.level;
     this.code=_errCode || "UNKNOWN_ERROR";
-    this.message=_errMsg || "Sorry, we don't really know what happened...";
+    this.message=_errMsg || error.stack || "Sorry, we don't really know what happened...";
     this.stack=_errStack;
     this.timestamp=_.now();
   }
