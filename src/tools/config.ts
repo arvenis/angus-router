@@ -15,7 +15,9 @@ const DEFAULT_CONFIG = {
     "module_dir": path.join(path.dirname(__dirname), "module"),
     "connection_file": path.join(os.homedir(), '.angus', 'profiles','default.yaml'),
     "openapi_file": path.join(path.dirname(__dirname), 'config', 'openapi', 'openapi.yaml'),
-    "inventory_file": path.join(path.dirname(__dirname), 'config', 'chaincode.inventory.yaml')
+    "inventory_file": path.join(path.dirname(__dirname), 'config', 'chaincode.inventory.yaml'),
+    // "registrar_id": "admin", // Comes from connection.yaml file / certificateAuthorities.{caName}.registrarId
+    "registrar_secret": "adminpw" // Could be ENV
 }
 
 export namespace Config {
