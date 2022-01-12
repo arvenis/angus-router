@@ -1,5 +1,6 @@
 // tslint:disable: no-duplicate-string
-import { Gateway, Identity, Transaction, Wallet, Wallets } from 'fabric-network';
+import FabricCAServices from 'fabric-ca-client';
+import { Gateway, Transaction, Wallet, Wallets, X509Identity } from 'fabric-network';
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import _ from 'lodash';
@@ -10,6 +11,24 @@ import { Config } from './config';
 import { getLogger } from './logger';
 
 const logger = getLogger(__filename);
+
+export interface UserToRegister {
+  caClient: FabricCAServices;
+  wallet: Wallet;
+  orgMspId: string;
+  adminId: string;
+  userId: string;
+  userIdSecret?: string;
+  affiliation?: string;
+}
+
+export interface UserToEnroll {
+  caClient: FabricCAServices;
+  wallet: Wallet;
+  orgMspId: string;
+  userId: string;
+  userIdSecret: string;
+}
 
 export function getConfiguration(): any {
   // TODO: Error handling
@@ -143,90 +162,137 @@ export async function processTransaction(params: FabricService, config?: FabricC
   }
 }
 
-// From integration-gateway - called by the initialization from the router.ts
-// async function enrollUser (username: string, password: string) {
+/**
+ * Create and register a new CA user in the system
+ * @returns secret of the user
+ */
+export const registerUser = async (userToRegister: UserToRegister): Promise<string> => {
+  try {
 
-//   const ccp = util.getConfiguration();
+      // Must use a CA admin (registrar) to register a new user
+      const adminIdentity = await userToRegister.wallet.get(userToRegister.adminId);
+      if (!adminIdentity) {
+          logger.info('An identity for the admin user does not exist in the wallet');
+          logger.debug('Enroll the admin user before retrying');
+          throw new Error("Admin wallet doesn't exist");
+      }
 
-//   const _defaultOrg=Config.getConfigItem("organization");
+      // build a user object for authenticating with the CA
+      const provider = userToRegister.wallet.getProviderRegistry().getProvider(adminIdentity.type);
+      const adminUser = await provider.getUserContext(adminIdentity, userToRegister.adminId);
 
-//   const _caUrl = _.get(ccp, 'certificateAuthorities.angusCa.url');
-//   const _mspId = _.get(ccp, `organizations.${_defaultOrg}.mspid`);
-//   const ca = new FabricCAServices(_caUrl);
+      // Register the user
+      // if affiliation is specified by client, the affiliation value must be configured in CA
+      const secret = await userToRegister.caClient.register({
+          affiliation: userToRegister.affiliation || '.',
+          enrollmentID: userToRegister.userId,
+          enrollmentSecret: userToRegister.userIdSecret || null,
+          role: 'client',
+      }, adminUser);
+      logger.info(`Successfully registered ${userToRegister.userId}.`);
+      return secret;
 
-//   logger.debug(`Got fabric CA services for ${_caUrl}`);
-//   const enrollment = await ca.enroll({ enrollmentID: username, enrollmentSecret: password });
+  } catch (error) {
+      logger.error(`Failed to register user : ${error}`);
+      throw error;
+  }
+};
 
-//   const userIdentity: X509Identity = {
-//       type: "X.509",
-//       mspId: _mspId,
-//       credentials: {
-//           certificate: enrollment.certificate,
-//           privateKey: enrollment.key.toBytes()
-//       }
-//   }
+/**
+ * Enroll a registered CA user and store the credentials in the wallet
+ * @param userToEnroll details about the user and the wallet to use
+ */
+export async function enrollUserToWallet(userToEnroll: UserToEnroll): Promise<void> {
+  try {
 
-//   logger.debug(`User identity created for ${username}`);
-//   await (await getWallet()).put(username, userIdentity)
-// }
+      // check that the identity isn't already in the wallet
+      const existingIdentity = await userToEnroll.wallet.get(userToEnroll.userId);
+      if (existingIdentity) {
+          logger.debug(`Identity ${userToEnroll.userId} already exists in the wallet`);
+          throw new Error(`Wallet already exist for ${userToEnroll.userId}`);
+      }
 
-// From fabric-gateway - called by the create-account custom handler
-export async function enrollUser(customerId: string, role: string = 'client') {
-  logger.debug('Start enrollUser');
+      // Enroll the user
+      const enrollment = await userToEnroll.caClient.enroll({ enrollmentID: userToEnroll.userId, enrollmentSecret: userToEnroll.userIdSecret });
+
+      // store the user
+      const identity: X509Identity = {
+        credentials: {
+          certificate: enrollment.certificate,
+          privateKey: enrollment.key.toBytes()
+        },
+        mspId: userToEnroll.orgMspId,
+        type: 'X.509',
+      };
+      await userToEnroll.wallet.put(userToEnroll.userId, identity);
+      logger.debug(`Successfully enrolled user ${userToEnroll.userId} and imported it into the wallet`);
+  } catch (error) {
+      logger.error(`Failed to enroll user ${userToEnroll.userId}: ${error}`);
+  }
+};
+
+/**
+ * Register new user to the system and enroll it ot the actual wallet
+ * @param userId Id of the new user
+ */
+export async function createNewUser(userId: string):Promise<void> {
+  logger.debug('Start createNewUser');
 
   try {
-    // Read fabric configuration
-    const ccp = getConfiguration();
-    logger.debug('Configuration loaded');
+    const adminId = getRegistrarId();
+    const caClient = getCertificateAuthority();
+    const wallet = await getWallet();
+    const orgMspId = getMspId();
 
-    const _adminId = ccp.certificateAuthorities[ccp.caName].registrarId;
+    const pw = await registerUser({
+      userId,
+      adminId,
+      caClient,
+      wallet,
+      orgMspId,
+    })
+    await enrollUserToWallet({
+        userId,
+        userIdSecret: pw,
+        caClient,
+        wallet,
+        orgMspId,
+    });
 
-    // Check to see if we've already enrolled the user.
-    if (await isWalletExists(customerId)) {
-      throw new Error(`Wallet already exist for ${customerId}`);
-    }
-
-    // Check to see if we've already enrolled the admin user.
-    if (!(await isWalletExists(_adminId))) {
-      throw new Error("Admin wallet doesn't exist");
-    }
-
-    // Create a new file system based wallet for managing identities.
-    logger.debug('Loading wallet...');
-    const wallet: Wallet =  await getWallet();
-    logger.debug('Wallet loaded');
-
-    // Create a new gateway for connecting to our peer node.
-    const gateway = new Gateway();
-    logger.debug(`Connecting to the gateway as ${_adminId}...`);
-    await gateway.connect(ccp, { wallet, identity: _adminId, discovery: { enabled: false } });
-    logger.debug(`Connected to the gateway as ${_adminId}.`);
-
-    // Get the CA client object from the gateway for interacting with the CA.
-    logger.debug('Get CA ...');
-    const ca = gateway.getClient().getCertificateAuthority();
-    logger.debug('Get admin identity...');
-    const adminIdentity = gateway.getCurrentIdentity();
-    logger.debug('Got identities.');
-
-    // Register the user, enroll the user, and import the new identity into the wallet.
-    logger.debug(`Creating secret for ${customerId}...`);
-    const secret = await ca.register({ affiliation: '.', enrollmentID: customerId, role }, adminIdentity);
-    logger.debug(`Secret created for ${customerId}`);
-    const enrollment = await ca.enroll({ enrollmentID: customerId, enrollmentSecret: secret });
-    logger.debug(`Enrollment created for ${customerId}`);
-    const userIdentity: Identity = X509WalletMixin.createIdentity(
-      ccp.mspName,
-      enrollment.certificate,
-      enrollment.key.toBytes()
-    );
-    logger.debug(`User identity created for ${customerId}`);
-    await wallet.import(customerId, userIdentity);
-    logger.info(`Successfully registered and enrolled user ${customerId} and imported it into the wallet`);
-    return userIdentity.type;
+    logger.info(`New User successfully registered and added to the wallet ${userId}.`);
+    return;
   } catch (error) {
     logger.error(error);
     throw new FabricError(error);
-    // return error;
   }
+}
+
+export function getCertificateAuthority(): FabricCAServices {
+  const ccp = getConfiguration();
+  const caName=_.get (ccp, 'caName');
+  const caUrl = _.get(ccp, `certificateAuthorities.${caName}.url`);
+  const ca = new FabricCAServices(caUrl);
+  
+  logger.debug(`Got fabric CA services for ${caUrl}`);
+  return ca;
+}
+
+export function getMspId(): string {
+  const ccp = getConfiguration();
+  // Default organization - Customer
+  const defaultOrg=_.get (ccp, 'client.organization');
+  const mspId = _.get(ccp, `organizations.${defaultOrg}.mspid`);
+  return mspId;
+}
+
+export function getRegistrarId(): string {
+  const ccp = getConfiguration();
+  const caName=_.get (ccp, 'caName');
+  const registrarId = _.get(ccp, `certificateAuthorities.${caName}.registrarId`);
+  return registrarId;
+}
+
+export function getRegistrarSecret(): string {
+  const registrarId = Config.getConfigItem("registrar_secret");   // Env
+  return registrarId;
 }
