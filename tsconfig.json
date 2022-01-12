@@ -10,7 +10,9 @@
         "moduleResolution": "node",
         "rootDir": "src",
         "module": "commonjs",
-        "declaration": false,
+        "declaration": true,
+        "declarationDir": "./dist/types",
+        "declarationMap":true,
         "sourceMap": true,
         "esModuleInterop": true,
         "experimentalDecorators": true
