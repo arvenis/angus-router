@@ -36,7 +36,7 @@ export function getConfiguration(): any {
 }
 
 export function getOpenApiAsJson(): any {
-  return yaml.load(fs.readFileSync( Config.getConfigItem('openapi_file'), 'utf8'));
+  return yaml.load(fs.readFileSync(Config.getConfigItem('openapi_file'), 'utf8'));
 }
 
 export async function getWallet(): Promise<Wallet> {
@@ -111,13 +111,11 @@ export async function processTransaction(params: FabricService, config?: FabricC
 
     // Create a new gateway for connecting to our peer node.
     const gateway = new Gateway();
-    let _customerId=params.customerId;
+    let _customerId = params.customerId;
     // Set default user if it exists
-    if (_.isUndefined(_customerId)) 
-      _customerId = _fabricConfig.defaultUser;
+    if (_.isUndefined(_customerId)) _customerId = _fabricConfig.defaultUser;
 
-    if (_.isUndefined(_customerId)) 
-      throw new AngusError(`${CONST.HEADER_USERID} is not defined in HTTP header. `);
+    if (_.isUndefined(_customerId)) throw new AngusError(`${CONST.HEADER_USERID} is not defined in HTTP header. `);
 
     logger.debug(`Connecting to the gateway as ${_customerId}...`);
     await gateway.connect(ccp, { wallet, identity: _customerId, discovery: { enabled: false } });
@@ -146,9 +144,7 @@ export async function processTransaction(params: FabricService, config?: FabricC
       const _transaction: Transaction = contract.createTransaction(_fabricConfig.serviceName);
       const _trId: string = _transaction.getTransactionId();
 
-      logger.debug(
-        `Transaction ${_fabricConfig.serviceName} has been submitted. trID: ${_trId}`
-      );
+      logger.debug(`Transaction ${_fabricConfig.serviceName} has been submitted. trID: ${_trId}`);
       await _transaction.submit(...[params.serviceParams]).then(data => {
         logger.debug(`Result: ${JSON.parse(data.toString())}`);
         return (retval = JSON.parse(data.toString()));
@@ -168,33 +164,34 @@ export async function processTransaction(params: FabricService, config?: FabricC
  */
 export const registerUser = async (userToRegister: UserToRegister): Promise<string> => {
   try {
+    // Must use a CA admin (registrar) to register a new user
+    const adminIdentity = await userToRegister.wallet.get(userToRegister.adminId);
+    if (!adminIdentity) {
+      logger.info('An identity for the admin user does not exist in the wallet');
+      logger.debug('Enroll the admin user before retrying');
+      throw new Error("Admin wallet doesn't exist");
+    }
 
-      // Must use a CA admin (registrar) to register a new user
-      const adminIdentity = await userToRegister.wallet.get(userToRegister.adminId);
-      if (!adminIdentity) {
-          logger.info('An identity for the admin user does not exist in the wallet');
-          logger.debug('Enroll the admin user before retrying');
-          throw new Error("Admin wallet doesn't exist");
-      }
+    // build a user object for authenticating with the CA
+    const provider = userToRegister.wallet.getProviderRegistry().getProvider(adminIdentity.type);
+    const adminUser = await provider.getUserContext(adminIdentity, userToRegister.adminId);
 
-      // build a user object for authenticating with the CA
-      const provider = userToRegister.wallet.getProviderRegistry().getProvider(adminIdentity.type);
-      const adminUser = await provider.getUserContext(adminIdentity, userToRegister.adminId);
-
-      // Register the user
-      // if affiliation is specified by client, the affiliation value must be configured in CA
-      const secret = await userToRegister.caClient.register({
-          affiliation: userToRegister.affiliation || '.',
-          enrollmentID: userToRegister.userId,
-          enrollmentSecret: userToRegister.userIdSecret || null,
-          role: 'client',
-      }, adminUser);
-      logger.info(`Successfully registered ${userToRegister.userId}.`);
-      return secret;
-
+    // Register the user
+    // if affiliation is specified by client, the affiliation value must be configured in CA
+    const secret = await userToRegister.caClient.register(
+      {
+        affiliation: userToRegister.affiliation || '.',
+        enrollmentID: userToRegister.userId,
+        enrollmentSecret: userToRegister.userIdSecret || null,
+        role: 'client',
+      },
+      adminUser
+    );
+    logger.info(`Successfully registered ${userToRegister.userId}.`);
+    return secret;
   } catch (error) {
-      logger.error(`Failed to register user : ${error}`);
-      throw error;
+    logger.error(`Failed to register user : ${error}`);
+    throw error;
   }
 };
 
@@ -204,38 +201,40 @@ export const registerUser = async (userToRegister: UserToRegister): Promise<stri
  */
 export async function enrollUserToWallet(userToEnroll: UserToEnroll): Promise<void> {
   try {
+    // check that the identity isn't already in the wallet
+    const existingIdentity = await userToEnroll.wallet.get(userToEnroll.userId);
+    if (existingIdentity) {
+      logger.debug(`Identity ${userToEnroll.userId} already exists in the wallet`);
+      throw new Error(`Wallet already exist for ${userToEnroll.userId}`);
+    }
 
-      // check that the identity isn't already in the wallet
-      const existingIdentity = await userToEnroll.wallet.get(userToEnroll.userId);
-      if (existingIdentity) {
-          logger.debug(`Identity ${userToEnroll.userId} already exists in the wallet`);
-          throw new Error(`Wallet already exist for ${userToEnroll.userId}`);
-      }
+    // Enroll the user
+    const enrollment = await userToEnroll.caClient.enroll({
+      enrollmentID: userToEnroll.userId,
+      enrollmentSecret: userToEnroll.userIdSecret,
+    });
 
-      // Enroll the user
-      const enrollment = await userToEnroll.caClient.enroll({ enrollmentID: userToEnroll.userId, enrollmentSecret: userToEnroll.userIdSecret });
-
-      // store the user
-      const identity: X509Identity = {
-        credentials: {
-          certificate: enrollment.certificate,
-          privateKey: enrollment.key.toBytes()
-        },
-        mspId: userToEnroll.orgMspId,
-        type: 'X.509',
-      };
-      await userToEnroll.wallet.put(userToEnroll.userId, identity);
-      logger.debug(`Successfully enrolled user ${userToEnroll.userId} and imported it into the wallet`);
+    // store the user
+    const identity: X509Identity = {
+      credentials: {
+        certificate: enrollment.certificate,
+        privateKey: enrollment.key.toBytes(),
+      },
+      mspId: userToEnroll.orgMspId,
+      type: 'X.509',
+    };
+    await userToEnroll.wallet.put(userToEnroll.userId, identity);
+    logger.debug(`Successfully enrolled user ${userToEnroll.userId} and imported it into the wallet`);
   } catch (error) {
-      logger.error(`Failed to enroll user ${userToEnroll.userId}: ${error}`);
+    logger.error(`Failed to enroll user ${userToEnroll.userId}: ${error}`);
   }
-};
+}
 
 /**
  * Register new user to the system and enroll it ot the actual wallet
  * @param userId Id of the new user
  */
-export async function createNewUser(userId: string):Promise<void> {
+export async function createNewUser(userId: string): Promise<void> {
   logger.debug('Start createNewUser');
 
   try {
@@ -250,13 +249,13 @@ export async function createNewUser(userId: string):Promise<void> {
       caClient,
       wallet,
       orgMspId,
-    })
+    });
     await enrollUserToWallet({
-        userId,
-        userIdSecret: pw,
-        caClient,
-        wallet,
-        orgMspId,
+      userId,
+      userIdSecret: pw,
+      caClient,
+      wallet,
+      orgMspId,
     });
 
     logger.info(`New User successfully registered and added to the wallet ${userId}.`);
@@ -269,10 +268,10 @@ export async function createNewUser(userId: string):Promise<void> {
 
 export function getCertificateAuthority(): FabricCAServices {
   const ccp = getConfiguration();
-  const caName=_.get (ccp, 'caName');
+  const caName = _.get(ccp, 'caName');
   const caUrl = _.get(ccp, `certificateAuthorities.${caName}.url`);
   const ca = new FabricCAServices(caUrl);
-  
+
   logger.debug(`Got fabric CA services for ${caUrl}`);
   return ca;
 }
@@ -280,19 +279,19 @@ export function getCertificateAuthority(): FabricCAServices {
 export function getMspId(): string {
   const ccp = getConfiguration();
   // Default organization - Customer
-  const defaultOrg=_.get (ccp, 'client.organization');
+  const defaultOrg = _.get(ccp, 'client.organization');
   const mspId = _.get(ccp, `organizations.${defaultOrg}.mspid`);
   return mspId;
 }
 
 export function getRegistrarId(): string {
   const ccp = getConfiguration();
-  const caName=_.get (ccp, 'caName');
+  const caName = _.get(ccp, 'caName');
   const registrarId = _.get(ccp, `certificateAuthorities.${caName}.registrarId`);
   return registrarId;
 }
 
 export function getRegistrarSecret(): string {
-  const registrarId = Config.getConfigItem("registrar_secret");   // Env
+  const registrarId = Config.getConfigItem('registrar_secret'); // Env
   return registrarId;
 }

@@ -14,13 +14,13 @@ import { ChaincodeInventory } from './tools/chaincodeinventory';
  *
  */
 
-export default async function(gatewayExpressApp: Express.Application) {
+export default async function (gatewayExpressApp: Express.Application) {
   gatewayExpressApp.use(bodyParser.json());
   gatewayExpressApp.use(bodyParser.urlencoded({ extended: true }));
   await APIDefinition.createInstance();
   ChaincodeInventory.createInstance();
   // Initialize needed accounts
-  initialize()
+  initialize();
 
   // OpenAPI documentaion
   gatewayExpressApp.use('/api-docs', swaggerUI.serve);

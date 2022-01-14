@@ -12,12 +12,11 @@ export namespace ChaincodeInventory {
   let _inventory: FabricConfig[];
 
   export function createInstance() {
-
     try {
       logger.debug('Creating chaincode inventory...');
-      const _inv = yaml.load(fs.readFileSync(Config.getConfigItem("inventory_file"), 'utf8'));
-      _inventory = _inv["ccMethods"];
-  
+      const _inv = yaml.load(fs.readFileSync(Config.getConfigItem('inventory_file'), 'utf8'));
+      _inventory = _inv['ccMethods'];
+
       Object.values(_inventory).forEach((_item: any) => {
         const _invItem: FabricConfig = _item;
         // This transformation is needed because of YAML label substitution
@@ -25,7 +24,6 @@ export namespace ChaincodeInventory {
         _inventory.push(_invItem);
       });
       logger.debug('Chaincode inventory created.');
-  
     } catch (error) {
       logger.error(error);
     }

@@ -6,8 +6,6 @@ import { AngusError, CONST } from './common';
 import { Config } from './config';
 import { getLogger } from './logger';
 
-
-
 const logger = getLogger(__filename);
 
 // tslint:disable-next-line: no-namespace
@@ -17,7 +15,9 @@ export namespace APIDefinition {
   export async function createInstance() {
     try {
       logger.debug('Creating OpenAPI definition...');
-      _apiDefinition = await SwaggerParser.validate(Config.getConfigItem("openapi_file"), { validate: { schema: false } });
+      _apiDefinition = await SwaggerParser.validate(Config.getConfigItem('openapi_file'), {
+        validate: { schema: false },
+      });
       logger.info('OpenAPI definition loaded.');
     } catch (error) {
       logger.error(error);
