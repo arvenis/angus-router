@@ -18,7 +18,7 @@ export namespace ChaincodeInventory {
       const _inv = yaml.load(fs.readFileSync(Config.getConfigItem("inventory_file"), 'utf8'));
       _inventory = _inv["ccMethods"];
   
-      Object.values(_inv["ccMethods"]).forEach((_item: any) => {
+      Object.values(_inventory).forEach((_item: any) => {
         const _invItem: FabricConfig = _item;
         // This transformation is needed because of YAML label substitution
         _invItem.channelName = _item.channelName.name;

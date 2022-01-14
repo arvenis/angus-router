@@ -57,7 +57,7 @@ export namespace APIDefinition {
     }
   }
 
-  export function getRequestBody(path: string, method): OpenAPIV3.RequestBodyObject {
+  export function getRequestBody(path: string, method: string): OpenAPIV3.RequestBodyObject {
     if (checkConfig(path, method)) {
       return _apiDefinition.paths[path][method.toLowerCase()].requestBody;
     } else {
