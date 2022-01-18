@@ -1,11 +1,11 @@
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import _ from 'lodash';
-import * as path from 'path';
 import * as os from 'os';
-
-
+import * as path from 'path';
 import { getLogger } from './logger';
+
+
 const logger = getLogger(__filename);
 
 const DEFAULT_CONFIG = {
@@ -15,7 +15,9 @@ const DEFAULT_CONFIG = {
     "module_dir": path.join(path.dirname(__dirname), "module"),
     "connection_file": path.join(os.homedir(), '.angus', 'profiles','default.yaml'),
     "openapi_file": path.join(path.dirname(__dirname), 'config', 'openapi', 'openapi.yaml'),
-    "inventory_file": path.join(path.dirname(__dirname), 'config', 'chaincode.inventory.yaml')
+    "inventory_file": path.join(path.dirname(__dirname), 'config', 'chaincode.inventory.yaml'),
+    // "registrar_id": "admin", // Comes from connection.yaml file / certificateAuthorities.{caName}.registrarId
+    "registrar_secret": "adminpw" // Could be ENV
 }
 
 export namespace Config {
@@ -31,8 +33,8 @@ export namespace Config {
         if (!_.isUndefined(configFile)) {
 
             try {
-                let _config = yaml.safeLoad(fs.readFileSync(configFile, 'utf8'));
-                _.assign (config, _config.config);
+                let _config = yaml.load(fs.readFileSync(configFile, 'utf8'));
+                _.assign (config, _config["config"]);
                 
             } catch (exception) {
                 logger.debug(exception);
@@ -53,6 +55,6 @@ export namespace Config {
                 config[key] = _s;
             }          
         });
-        logger.info(`Used configuration: \n${yaml.safeDump(config)}`);
+        logger.info(`Used configuration: \n${yaml.dump(config)}`);
     }
 }

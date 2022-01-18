@@ -3,6 +3,7 @@ import * as Express from 'express';
 import _ from 'lodash';
 import * as swaggerUI from 'swagger-ui-express';
 import { errorHandler, handleRequest, validateInputParameters, validateResponse } from './handler';
+import { initialize } from './init';
 import { APIDefinition } from './tools/apidefinition';
 import { ChaincodeInventory } from './tools/chaincodeinventory';
 
@@ -19,7 +20,7 @@ export default async function(gatewayExpressApp: Express.Application) {
   await APIDefinition.createInstance();
   ChaincodeInventory.createInstance();
   // Initialize needed accounts
-  // initialize()
+  initialize()
 
   // OpenAPI documentaion
   gatewayExpressApp.use('/api-docs', swaggerUI.serve);
