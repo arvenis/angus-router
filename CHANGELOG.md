@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added 
+## [0.2.0] - 2021-0?-??
+
+### Added
 
 - Add `createNewUser` utilitiy
 - Add `getConnectedGateway` utility
