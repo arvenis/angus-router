@@ -1,20 +1,18 @@
-{ 
-    "include": [
-        "src/**/*"
-    ],               
-    "compilerOptions": {
-        "outDir": "dist",
-        "target": "es6",
-        "lib": ["es7", "esnext.asynciterable"],
-        "typeRoots": ["node_modules/@types"],
-        "moduleResolution": "node",
-        "rootDir": "src",
-        "module": "commonjs",
-        "declaration": true,
-        "declarationDir": "./dist/types",
-        "declarationMap":true,
-        "sourceMap": true,
-        "esModuleInterop": true,
-        "experimentalDecorators": true
-    }
+{
+  "include": ["src/**/*"],
+  "compilerOptions": {
+    "outDir": "dist",
+    "target": "es6",
+    "lib": ["es7", "esnext.asynciterable"],
+    "typeRoots": ["node_modules/@types"],
+    "moduleResolution": "node",
+    "rootDir": "src",
+    "module": "commonjs",
+    "declaration": true,
+    "declarationDir": "./dist/types",
+    "declarationMap": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true
+  }
 }

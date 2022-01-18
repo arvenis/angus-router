@@ -17,7 +17,7 @@
     "coverage": "node_modules/.bin/nyc mocha",
     "build": "rimraf ./dist && tsc && cp package.json ./dist && cp -r ./src/config ./dist",
     "test": "jest",
-    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
+    "prettier-format": "prettier --config .prettierrc . --write",
     "lint": "eslint . --ext .ts",
     "prepare": "husky install"
   },

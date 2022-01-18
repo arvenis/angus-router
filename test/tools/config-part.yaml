@@ -1,4 +1,4 @@
 config:
-    config_dir: from_file
-    wallet_dir: from_file
-    components_dir: from_file
+  config_dir: from_file
+  wallet_dir: from_file
+  components_dir: from_file
