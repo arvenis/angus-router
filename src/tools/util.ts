@@ -1,4 +1,3 @@
-// tslint:disable: no-duplicate-string
 import FabricCAServices from 'fabric-ca-client';
 import { Gateway, Transaction, Wallet, Wallets, X509Identity } from 'fabric-network';
 import * as fs from 'fs';
@@ -51,7 +50,7 @@ export function getAccountId(): string {
 export async function isWalletExists(customerId: string): Promise<boolean> {
   try {
     const wallet: Wallet = await getWallet();
-    let userExists = !_.isUndefined(await wallet.get(customerId));
+    const userExists = !_.isUndefined(await wallet.get(customerId));
 
     if (userExists) {
       logger.debug(`Wallet ${customerId} already exists.`);

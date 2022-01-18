@@ -31,7 +31,7 @@ export namespace Config {
     config = _.clone(DEFAULT_CONFIG);
     if (!_.isUndefined(configFile)) {
       try {
-        let _config = yaml.load(fs.readFileSync(configFile, 'utf8'));
+        const _config = yaml.load(fs.readFileSync(configFile, 'utf8'));
         _.assign(config, _config['config']);
       } catch (exception) {
         logger.debug(exception);
@@ -46,7 +46,7 @@ export namespace Config {
           config[key] = path.resolve(path.dirname(configFile), value);
         }
       }
-      let _s = process.env[key.toUpperCase()];
+      const _s = process.env[key.toUpperCase()];
       if (!_.isUndefined(_s)) {
         logger.debug(`Using env: ${key}: ${_s}`);
         config[key] = _s;

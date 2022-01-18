@@ -1,6 +1,5 @@
 import bodyParser from 'body-parser';
 import * as Express from 'express';
-import _ from 'lodash';
 import * as swaggerUI from 'swagger-ui-express';
 import { errorHandler, handleRequest, validateInputParameters, validateResponse } from './handler';
 import { initialize } from './init';

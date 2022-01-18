@@ -8,8 +8,8 @@ export async function initialize() {
   logger.debug('Checking admin enrollment..');
 
   const _registrarId = util.getRegistrarId();
-  let _registrarSecret = util.getRegistrarSecret();
-  let _systemUsers = ['system'];
+  const _registrarSecret = util.getRegistrarSecret();
+  const _systemUsers = ['system'];
   const caClient = util.getCertificateAuthority();
   const wallet = await util.getWallet();
   const orgMspId = util.getMspId();

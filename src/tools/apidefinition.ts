@@ -1,4 +1,3 @@
-// tslint:disable no-identical-functions
 import SwaggerParser from '@apidevtools/swagger-parser';
 import _ from 'lodash';
 import { OpenAPI, OpenAPIV3 } from 'openapi-types';

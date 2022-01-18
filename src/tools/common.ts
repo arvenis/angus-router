@@ -1,7 +1,5 @@
-// tslint:disable: max-classes-per-file
 import { NextFunction, Request, Response } from 'express';
 import _ from 'lodash';
-import { getLogger } from './logger';
 
 export enum ServiceType {
   SUBMIT = 'submit',
@@ -60,9 +58,7 @@ export class FabricError extends GenericError {
     const _errMsg: string = _errPieces[2];
     const _errStack: string = _errPieces[3];
 
-    // tslint:disable-next-line:no-console
     console.error('*************************');
-    // tslint:disable-next-line:no-console
     console.error(error);
     this.name = 'FabricError';
     this.status = error.status || 500;
