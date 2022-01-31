@@ -17,8 +17,10 @@
     "coverage": "node_modules/.bin/nyc mocha",
     "build": "rimraf ./dist && tsc && cp package.json ./dist && cp -r ./src/config ./dist",
     "test": "jest",
-    "prettier-format": "prettier --config .prettierrc . --write",
+    "format": "prettier --config .prettierrc 'src/**/*.ts'",
+    "format:fix": "npm run format -- --write",
     "lint": "eslint . --ext .ts",
+    "lint:fix": "npm run lint -- --fix",
     "prepare": "husky install"
   },
   "dependencies": {
