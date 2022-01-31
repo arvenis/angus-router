@@ -1,0 +1,5 @@
+# ignoring generated files
+src/config/**/*.yml
+src/config/**/*.yaml
+node_modules
+dist

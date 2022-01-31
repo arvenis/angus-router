@@ -1,12 +1,9 @@
-// tslint:disable no-identical-functions
+import SwaggerParser from '@apidevtools/swagger-parser';
 import _ from 'lodash';
 import { OpenAPI, OpenAPIV3 } from 'openapi-types';
-import SwaggerParser from 'swagger-parser';
 import { AngusError, CONST } from './common';
 import { Config } from './config';
 import { getLogger } from './logger';
-
-
 
 const logger = getLogger(__filename);
 
@@ -17,7 +14,9 @@ export namespace APIDefinition {
   export async function createInstance() {
     try {
       logger.debug('Creating OpenAPI definition...');
-      _apiDefinition = await SwaggerParser.validate(Config.getConfigItem("openapi_file"), { validate: { schema: false } });
+      _apiDefinition = await SwaggerParser.validate(Config.getConfigItem('openapi_file'), {
+        validate: { schema: false },
+      });
       logger.info('OpenAPI definition loaded.');
     } catch (error) {
       logger.error(error);
@@ -57,7 +56,7 @@ export namespace APIDefinition {
     }
   }
 
-  export function getRequestBody(path: string, method): OpenAPIV3.RequestBodyObject {
+  export function getRequestBody(path: string, method: string): OpenAPIV3.RequestBodyObject {
     if (checkConfig(path, method)) {
       return _apiDefinition.paths[path][method.toLowerCase()].requestBody;
     } else {

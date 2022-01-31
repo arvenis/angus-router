@@ -1,15 +1,15 @@
+/* import { POINT_CONVERSION_UNCOMPRESSED } from 'constants';
 import * as Express from 'express';
-import _ from 'lodash';
-
-import { Gateway, Identity, X509WalletMixin } from 'fabric-network';
 import FabricCAServices from 'fabric-ca-client';
-
-import { FabricService, AngusError } from '../../tools/common';
-import * as util from '../../tools/util';
-
+import { Gateway, Identity, X509WalletMixin } from 'fabric-network';
+import _ from 'lodash';
+import { AngusError, FabricService } from '../../tools/common';
 // Get logger
 import { getLogger } from '../../tools/logger';
-import { POINT_CONVERSION_UNCOMPRESSED } from 'constants';
+import * as util from '../../tools/util';
+
+
+
 const logger = getLogger(__filename);
 
 export async function customHandler(
@@ -51,7 +51,8 @@ export async function customHandler(
 
   // Create a new CA client for interacting with the CA.
   logger.debug(`Get fabric CA services for ${ccp.caName}...`);
-  const caURL = _.get(ccp, 'certificateAuthorities.angusCa.url');
+  const _caName=_.get (ccp, 'caName');
+  const caURL = _.get(ccp, `certificateAuthorities.${_caName}.url`);
   const ca = new FabricCAServices(caURL);
   logger.debug(`Got fabric CA services for ${ccp.caName}. url: ${caURL}`);
 
@@ -91,4 +92,4 @@ export async function customHandler(
     type: userIdentity.type,
     mspId: _mspId
   }
-}
+} */

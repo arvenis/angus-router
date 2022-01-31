@@ -1,5 +1,5 @@
 name: Build Angus router
-on: 
+on:
   push:
     branches:
       - master
@@ -9,7 +9,6 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v2
 
@@ -27,13 +26,13 @@ jobs:
 
       - name: Run unit tests
         run: echo Run unit tests here...
-        
+
       - name: Build package
         run: npm run build
 
       - name: Package application
         run: yarn pack
-      
+
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
@@ -41,7 +40,7 @@ jobs:
           path: angus-router*.tgz
 
       - name: Login to npmjs
-        run: echo //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} > .npmrc 
+        run: echo //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} > .npmrc
 
       - name: Push artifact
         run: npm publish $(ls angus-router*) --access public

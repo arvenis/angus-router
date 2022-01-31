@@ -12,22 +12,20 @@ import { Config } from './tools/config';
 import { getLogger } from './tools/logger';
 import * as util from './tools/util';
 
-
-
 const logger = getLogger(__filename);
 
 export async function validateInputParameters(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
   try {
     logger.debug(`Validating ${req.path} parameters based on OpenAPI definition...`);
-    if (_.eq(req.path, "/api-docs/openapi.yaml")) {
-      logger.debug ("Return parsed OpenAPI definition");
+    if (_.eq(req.path, '/api-docs/openapi.yaml')) {
+      logger.debug('Return parsed OpenAPI definition');
       res.json(APIDefinition.getApiDefinition());
       return;
     }
 
     const validator: OpenAPIRequestValidator = new OpenAPIRequestValidator({
       parameters: APIDefinition.getParameters(req.path, req.method),
-      requestBody: APIDefinition.getRequestBody(req.path, req.method)
+      requestBody: APIDefinition.getRequestBody(req.path, req.method),
     });
 
     const errors = validator.validate(req);
@@ -75,7 +73,7 @@ export async function handleRequest(req: Express.Request, res: Express.Response,
     const _fabricService: FabricService = {
       customerId: req.get(CONST.HEADER_USERID),
       serviceParams: JSON.stringify(_serviceParams),
-      fabricServices: _fabricConfig
+      fabricServices: _fabricConfig,
     };
 
     // Get custom handler
@@ -85,18 +83,16 @@ export async function handleRequest(req: Express.Request, res: Express.Response,
     if (!_.isNil(_customHandler)) {
       let _mPath: string;
       // Custom handler has been defined
-      if (fs.existsSync(path.join(__dirname, "module", req.path) + '.js') ) {
+      if (fs.existsSync(path.join(__dirname, 'module', req.path) + '.js')) {
         // Check built-in custom handler (module folder)
-        _mPath=path.join(__dirname, "module", req.path);
+        _mPath = path.join(__dirname, 'module', req.path);
         logger.debug(`Start built-in customHandler: ${_mPath}:${_customHandler}`);
-
       } else if (
-        fs.existsSync(path.join(Config.getConfigItem("module_dir"), req.path)+ '.js') // .JS file
+        fs.existsSync(path.join(Config.getConfigItem('module_dir'), req.path) + '.js') // .JS file
       ) {
         // Check external custom handler
-        _mPath = path.join(Config.getConfigItem("module_dir"), req.path);
+        _mPath = path.join(Config.getConfigItem('module_dir'), req.path);
         logger.debug(`Start external customHandler in ${_mPath}:${_customHandler}`);
-
       } else {
         throw new AngusError(`Specified customHandler ${_customHandler} not found in module path`);
       }
@@ -122,7 +118,7 @@ export async function validateResponse(req: Express.Request, res: Express.Respon
     logger.debug(`Validating ${req.path} response based on OpenAPI definition...`);
 
     const validator: OpenAPIResponseValidator = new OpenAPIResponseValidator({
-      responses: APIDefinition.getResponses(req.path, req.method)
+      responses: APIDefinition.getResponses(req.path, req.method),
     } as any);
 
     const errors = validator.validateResponse(200, req.res);
@@ -148,7 +144,7 @@ export async function errorHandler(err: any, req: Express.Request, res: Express.
       logger.debug(`Validating ${req.path} error response based on OpenAPI definition...`);
 
       const validator: OpenAPIResponseValidator = new OpenAPIResponseValidator({
-        responses: APIDefinition.getResponses(req.path, req.method)
+        responses: APIDefinition.getResponses(req.path, req.method),
       } as any);
 
       const errors = validator.validateResponse(err.status, err);
