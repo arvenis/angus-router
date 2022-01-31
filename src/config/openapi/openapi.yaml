@@ -10,7 +10,7 @@ paths:
   /maintenance/healthcheck:
     x-angus-config:
       - getVersion
-    x-angus-custom-handler: customHandler
+    x-angus-custom-handler: maintenance/healthcheck
     get:
       tags:
         - Maintenance

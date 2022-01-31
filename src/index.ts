@@ -1,6 +1,6 @@
 // The public interface of the Angus-Router module
 
-export * from './server';
+export { AngusRouter } from './server';
 export * from './tools/common';
 export * from './tools/logger';
 export {
@@ -10,5 +10,6 @@ export {
   getConnectedGateway,
   getWallet,
   isWalletExists,
-  processTransaction,
+  processTransaction
 } from './tools/util';
+

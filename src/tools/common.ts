@@ -30,6 +30,8 @@ export class FabricService {
 
 export type FCustomHandler = (params: FabricService, request: Request, response: Response, next: NextFunction) => any;
 
+export type FCustomHandlerMap = Record<string, FCustomHandler>;
+
 export class GenericError extends Error {
   public status: number;
   public code: string;

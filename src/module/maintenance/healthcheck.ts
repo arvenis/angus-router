@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import _ from 'lodash';
 import * as path from 'path';
-import { FabricConfig, FabricService } from '../../tools/common';
+import { FabricConfig, FabricService, FCustomHandler } from '../../tools/common';
 import * as util from '../../tools/util';
 
 // import {MResHealthcheck} from '../../tools/model/mResHealthcheck'
@@ -12,7 +12,7 @@ import * as util from '../../tools/util';
 // import { getLogger } from '../../tools/logger';
 // const logger = getLogger(__filename);
 
-export async function customHandler(
+export const healthcheck: FCustomHandler = async (
   params: FabricService,
   req: Express.Request,
   res: Express.Response,

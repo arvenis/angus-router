@@ -7,7 +7,7 @@ import { OpenAPI, OpenAPIV3 } from 'openapi-types';
 import * as path from 'path';
 import { APIDefinition } from './tools/apidefinition';
 import { ChaincodeInventory } from './tools/chaincodeinventory';
-import { AngusError, CONST, FabricConfig, FabricService, FCustomHandler } from './tools/common';
+import { AngusError, CONST, FabricConfig, FabricService, FCustomHandler, FCustomHandlerMap } from './tools/common';
 import { Config } from './tools/config';
 import { getLogger } from './tools/logger';
 import * as util from './tools/util';
@@ -44,12 +44,16 @@ export async function validateInputParameters(req: Express.Request, res: Express
   }
 }
 
-export async function handleRequest(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+export const handleRequest = (customhandlers: FCustomHandlerMap) => async (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
+  
+  // }
+  
+  // export async function handleRequest(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
   const _parameters: OpenAPI.Parameters = APIDefinition.getParameters(req.path, req.method);
   const _requestBody: OpenAPIV3.RequestBodyObject = APIDefinition.getRequestBody(req.path, req.method);
-
+  
   let _serviceParams: object = {};
-
+  
   try {
     // Transforming parameters from URL
     _.forEach(_parameters, (p: OpenAPIV3.ParameterObject) => {
@@ -57,47 +61,61 @@ export async function handleRequest(req: Express.Request, res: Express.Response,
         _serviceParams[p.name] = req.query[p.name];
       }
     });
-
+    
     // Transforming parameters from request body
     if (!_.isUndefined(_requestBody)) {
       _serviceParams = req.body;
     }
-
+    
     // Get Inventory services
     const _fabricConfig: FabricConfig[] = ChaincodeInventory.getInventoryItems(APIDefinition.getFabricConfig(req.path));
     if (_.isEmpty(_fabricConfig)) {
       throw new Error(`No config found for ${req.path}`);
     }
-
+    
     // Fill Fabric service object
     const _fabricService: FabricService = {
       customerId: req.get(CONST.HEADER_USERID),
       serviceParams: JSON.stringify(_serviceParams),
       fabricServices: _fabricConfig,
     };
-
+    
     // Get custom handler
     const _customHandler: string = APIDefinition.getCustomHandler(req.path);
+    // const _customHandler: string = req.path.slice(1);
+    console.log("### ~ file: handler.ts ~ line 87 ~ handleRequest ~ req.path", req.path)
+    console.log("### ~ file: handler.ts ~ line 55 ~ handleRequest ~ _parameters", _parameters)
+    console.log("### ~ file: handler.ts ~ line 59 ~ handleRequest ~ _serviceParams", _serviceParams)
+    console.log("### ~ file: handler.ts ~ line 87 ~ handleRequest ~ _customHandler", _customHandler)
+    console.log("### ~ file: handler.ts ~ line 50 ~ handleRequest ~ customhandlers", customhandlers)
+    console.log("### ~ file: handler.ts ~ line 50 ~ handleRequest ~ customhandlers[_customHandler]", customhandlers[_customHandler])
     let retval: any = {};
 
-    if (!_.isNil(_customHandler)) {
+    if (!_.isNil(_customHandler) && !_.isNil(customhandlers)) {
       let _mPath: string;
       // Custom handler has been defined
-      if (fs.existsSync(path.join(__dirname, 'module', req.path) + '.js')) {
-        // Check built-in custom handler (module folder)
-        _mPath = path.join(__dirname, 'module', req.path);
-        logger.debug(`Start built-in customHandler: ${_mPath}:${_customHandler}`);
-      } else if (
-        fs.existsSync(path.join(Config.getConfigItem('module_dir'), req.path) + '.js') // .JS file
-      ) {
-        // Check external custom handler
-        _mPath = path.join(Config.getConfigItem('module_dir'), req.path);
-        logger.debug(`Start external customHandler in ${_mPath}:${_customHandler}`);
-      } else {
+      if (_.isNil(customhandlers[_customHandler])) {
         throw new AngusError(`Specified customHandler ${_customHandler} not found in module path`);
       }
+      // if (fs.existsSync(path.join(__dirname, "module", req.path) + '.js') ) {
+      //   // Check built-in custom handler (module folder)
+      //   _mPath=path.join(__dirname, "module", req.path);
+      //   logger.debug(`Start built-in customHandler: ${_mPath}:${_customHandler}`);
 
-      const fn_customHandler: FCustomHandler = require(_mPath)[_customHandler];
+      // } else if (
+      //   fs.existsSync(path.join(Config.getConfigItem("module_dir"), req.path)+ '.js') // .JS file
+      //   // || fs.existsSync(path.join(Config.getConfigItem("module_dir"), req.path)+ '.ts') // .TS file
+      // ) {
+      //   // Check external custom handler
+      //   _mPath = path.join(Config.getConfigItem("module_dir"), req.path);
+      //   logger.debug(`Start external customHandler in ${_mPath}:${_customHandler}`);
+
+      // } else {
+      //   throw new AngusError(`Specified customHandler ${_customHandler} not found in module path`);
+      // }
+
+      // const fn_customHandler: FCustomHandler = require(_mPath)[_customHandler];
+      const fn_customHandler: FCustomHandler = customhandlers[_customHandler];
 
       retval = await fn_customHandler(_fabricService, req, res, next);
     } else {
