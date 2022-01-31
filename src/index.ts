@@ -10,4 +10,5 @@ export {
   getConnectedGateway,
   getWallet,
   isWalletExists,
+  processTransaction,
 } from './tools/util';

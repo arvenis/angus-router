@@ -89,6 +89,7 @@ export async function getConnectedGateway(customerId: string): Promise<Gateway> 
 }
 
 export async function processTransaction(params: FabricService, config?: FabricConfig): Promise<any> {
+  const gateway = new Gateway();
   try {
     let _fabricConfig: FabricConfig;
     if (_.isNil(config)) {
@@ -109,7 +110,6 @@ export async function processTransaction(params: FabricService, config?: FabricC
     logger.debug('Wallet loaded.');
 
     // Create a new gateway for connecting to our peer node.
-    const gateway = new Gateway();
     let _customerId = params.customerId;
     // Set default user if it exists
     if (_.isUndefined(_customerId)) _customerId = _fabricConfig.defaultUser;
@@ -154,6 +154,10 @@ export async function processTransaction(params: FabricService, config?: FabricC
     return retval;
   } catch (error) {
     throw new FabricError(error);
+  } finally {
+    // Disconnect from the gateway when the application is closing
+    // This will close all connections to the network
+    gateway.disconnect();
   }
 }
 

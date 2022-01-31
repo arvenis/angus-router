@@ -49,7 +49,3 @@ export class AngusRouter {
     setImmediate(() => startGatewayBackend());
   }
 }
-
-export async function processTransaction(params: FabricService, config?: FabricConfig): Promise<any> {
-  return await util.processTransaction(params, config);
-}
